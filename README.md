@@ -1,5 +1,5 @@
 # gosu
-## Provides extendions to standard gosu libraries.
+Provides extendions to standard gosu libraries.
 
 ### Validation
 `Validation.require()`  is a syntactic sugar for validation code which throws exceptions (e.g. validating that the function input is correct). For example:
