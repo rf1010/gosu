@@ -1,9 +1,9 @@
 package gosu.logging
 
-uses gosu.stacktrace.StackTraceElementEnhancement
 uses org.slf4j.LoggerFactory
 uses org.slf4j.Marker
 
+uses java.lang.StackTraceElement
 uses java.lang.Throwable
 
 class Logger implements org.slf4j.Logger {
@@ -14,12 +14,13 @@ class Logger implements org.slf4j.Logger {
   var _loggerName = Logger.ROOT_LOGGER_NAME
   var _logger = LoggerFactory.getLogger(_loggerName)
 
-  private var _logDecorator: block(): String as readonly LogDecorator = \ -> {
-    var stackTraceLine = StackTraceElementEnhancement
-        .getWithOffset_ext(3).Decorator_ext
-        .withStackTraceFormat(CLASS_FUNCTION)
-        .DisplayName
-    return stackTraceLine != null ? stackTraceLine + " : " : ""
+  private static function decorator(offset: int = 5): block(): String {
+    return \ -> StackTraceElement.getWithOffset_ext(offset).Decorator_ext.DisplayName
+  }
+
+  private static function decorateMsg(msg: String, decorator(): String): String {
+    var logDecoration = decorator != null ? decorator() : null
+    return logDecoration != null ? "${logDecoration} : ${msg}" : msg
   }
 
   private construct() {
@@ -35,15 +36,6 @@ class Logger implements org.slf4j.Logger {
     _loggerName = logger.Name
   }
 
-  /**
-   *  Allows to override the default log decorator (a block which evaluates to a string and get prepended to
-   *  each log message (typically used to log class/package/function names, etc.).
-   */
-  function withDecorator(dec: block(): String): Logger {
-    _logDecorator = dec
-    return this
-  }
-  
   /**
    *  Init logger with the name passed as a parameter
    */
@@ -80,131 +72,166 @@ class Logger implements org.slf4j.Logger {
   }
 
   /**
-   *  Log at the trace level.
+   *  A private function to dispatch a logging statement.
    */
-  function trace(msgBlock: block(): String) {
-    if ( TraceEnabled ) {
-      _logger.trace("${LogDecorator()}${msgBlock()}")
+  private function traceWithDecoration(msgBlock(): String, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function traceWithDecoration(msgBlock(): String, p1: Object, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function traceWithDecoration(msgBlock(): String, p1: Object, p2: Object, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(decorateMsg(msgBlock(), decorator), p1, p2)
+    }
+  }
+
+  private function traceWithDecoration(msgBlock(): String, p1: Throwable, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function traceWithDecoration(p0: Marker, msgBlock(): String, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(p0, decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function traceWithDecoration(p0: Marker, msgBlock(): String, p2: Object, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function traceWithDecoration(p0: Marker, msgBlock(): String, p2: Object, p3: Object, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function traceWithDecoration(p0: Marker, msgBlock(): String, p2: Throwable, decorator(): String) {
+    if (TraceEnabled) {
+      _logger.trace(p0, decorateMsg(msgBlock(), decorator), p2)
     }
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: String) {
-    trace(\ -> p0)
+  function trace(msg(): String) {
+    traceWithDecoration(msg, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(msgBlock: block(): String, p1: Object) {
-    if ( TraceEnabled ) {
-      _logger.trace("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function trace(msg: String) {
+    traceWithDecoration(\ -> msg, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: String, p1: Object) {
-    trace(\ -> p0, p1)
+  function trace(msg(): String, p1: Object) {
+    traceWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(msgBlock: block(): String, p1: Object, p2: Object) {
-    if ( TraceEnabled ) {
-      _logger.trace("${LogDecorator()}${msgBlock()}", p1, p2)
-    }
+  override function trace(msg: String, p1: Object) {
+    traceWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: String, p1: Object, p2: Object) {
-    trace(\ -> p0, p1, p2)
+  function trace(msg(): String, p1: Object, p2: Object) {
+    traceWithDecoration(msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(msgBlock: block(): String, p1: Throwable) {
-    if ( TraceEnabled ) {
-      _logger.trace("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function trace(msg: String, p1: Object, p2: Object) {
+    traceWithDecoration(\ -> msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: String, p1: Throwable) {
-    trace(\ -> p0, p1)
+  function trace(msg(): String, p1: Throwable) {
+    traceWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(p0: Marker, msgBlock: block(): String) {
-    if ( TraceEnabled ) {
-      _logger.trace(p0, "${LogDecorator()}${msgBlock()}")
-    }
+  override function trace(msg: String, p1: Throwable) {
+    traceWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: Marker, p1: String) {
-    trace(p0, \ -> p1)
+  function trace(p0: Marker, msg(): String) {
+    traceWithDecoration(p0, msg, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(p0: Marker, msgBlock: block(): String, p2: Object) {
-    if ( TraceEnabled ) {
-      _logger.trace(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function trace(p0: Marker, msg: String) {
+    traceWithDecoration(p0, \ -> msg, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: Marker, p1: String, p2: Object) {
-    trace(p0, \ -> p1, p2)
+  function trace(p0: Marker, msg(): String, p2: Object) {
+    traceWithDecoration(p0, msg, p2, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(p0: Marker, msgBlock: block(): String, p2: Object, p3: Object) {
-    if ( TraceEnabled ) {
-      _logger.trace(p0, "${LogDecorator()}${msgBlock()}", p2, p3)
-    }
+  override function trace(p0: Marker, msg: String, p2: Object) {
+    traceWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: Marker, p1: String, p2: Object, p3: Object) {
-    trace(p0, \ -> p1, p2, p3)
+  function trace(p0: Marker, msg(): String, p2: Object, p3: Object) {
+    traceWithDecoration(p0, msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  function trace(p0: Marker, msgBlock: block(): String, p2: Throwable) {
-    if ( TraceEnabled ) {
-      _logger.trace(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function trace(p0: Marker, msg: String, p2: Object, p3: Object) {
+    traceWithDecoration(p0, \ -> msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the trace level.
    */
-  override function trace(p0: Marker, p1: String, p2: Throwable) {
-    trace(p0, \ -> p1, p2)
+  function trace(p0: Marker, msg(): String, p2: Throwable) {
+    traceWithDecoration(p0, msg, p2, decorator())
+  }
+
+  /**
+   *  Log at the trace level.
+   */
+  override function trace(p0: Marker, msg: String, p2: Throwable) {
+    traceWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
@@ -222,131 +249,166 @@ class Logger implements org.slf4j.Logger {
   }
 
   /**
-   *  Log at the debug level.
+   *  A private function to dispatch a logging statement.
    */
-  function debug(msgBlock: block(): String) {
-    if ( DebugEnabled ) {
-      _logger.debug("${LogDecorator()}${msgBlock()}")
+  private function debugWithDecoration(msgBlock(): String, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function debugWithDecoration(msgBlock(): String, p1: Object, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function debugWithDecoration(msgBlock(): String, p1: Object, p2: Object, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(decorateMsg(msgBlock(), decorator), p1, p2)
+    }
+  }
+
+  private function debugWithDecoration(msgBlock(): String, p1: Throwable, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function debugWithDecoration(p0: Marker, msgBlock(): String, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(p0, decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function debugWithDecoration(p0: Marker, msgBlock(): String, p2: Object, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function debugWithDecoration(p0: Marker, msgBlock(): String, p2: Object, p3: Object, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function debugWithDecoration(p0: Marker, msgBlock(): String, p2: Throwable, decorator(): String) {
+    if (DebugEnabled) {
+      _logger.debug(p0, decorateMsg(msgBlock(), decorator), p2)
     }
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: String) {
-    debug(\ -> p0)
+  function debug(msg(): String) {
+    debugWithDecoration(msg, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(msgBlock: block(): String, p1: Object) {
-    if ( DebugEnabled ) {
-      _logger.debug("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function debug(msg: String) {
+    debugWithDecoration(\ -> msg, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: String, p1: Object) {
-    debug(\ -> p0, p1)
+  function debug(msg(): String, p1: Object) {
+    debugWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(msgBlock: block(): String, p1: Object, p2: Object) {
-    if ( DebugEnabled ) {
-      _logger.debug("${LogDecorator()}${msgBlock()}", p1, p2)
-    }
+  override function debug(msg: String, p1: Object) {
+    debugWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: String, p1: Object, p2: Object) {
-    debug(\ -> p0, p1, p2)
+  function debug(msg(): String, p1: Object, p2: Object) {
+    debugWithDecoration(msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(msgBlock: block(): String, p1: Throwable) {
-    if ( DebugEnabled ) {
-      _logger.debug("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function debug(msg: String, p1: Object, p2: Object) {
+    debugWithDecoration(\ -> msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: String, p1: Throwable) {
-    debug(\ -> p0, p1)
+  function debug(msg(): String, p1: Throwable) {
+    debugWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(p0: Marker, msgBlock: block(): String) {
-    if ( DebugEnabled ) {
-      _logger.debug(p0, "${LogDecorator()}${msgBlock()}")
-    }
+  override function debug(msg: String, p1: Throwable) {
+    debugWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: Marker, p1: String) {
-    debug(p0, \ -> p1)
+  function debug(p0: Marker, msg(): String) {
+    debugWithDecoration(p0, msg, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(p0: Marker, msgBlock: block(): String, p2: Object) {
-    if ( DebugEnabled ) {
-      _logger.debug(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function debug(p0: Marker, msg: String) {
+    debugWithDecoration(p0, \ -> msg, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: Marker, p1: String, p2: Object) {
-    debug(p0, \ -> p1, p2)
+  function debug(p0: Marker, msg(): String, p2: Object) {
+    debugWithDecoration(p0, msg, p2, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(p0: Marker, msgBlock: block(): String, p2: Object, p3: Object) {
-    if ( DebugEnabled ) {
-      _logger.debug(p0, "${LogDecorator()}${msgBlock()}", p2, p3)
-    }
+  override function debug(p0: Marker, msg: String, p2: Object) {
+    debugWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: Marker, p1: String, p2: Object, p3: Object) {
-    debug(p0, \ -> p1, p2, p3)
+  function debug(p0: Marker, msg(): String, p2: Object, p3: Object) {
+    debugWithDecoration(p0, msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  function debug(p0: Marker, msgBlock: block(): String, p2: Throwable) {
-    if ( DebugEnabled ) {
-      _logger.debug(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function debug(p0: Marker, msg: String, p2: Object, p3: Object) {
+    debugWithDecoration(p0, \ -> msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the debug level.
    */
-  override function debug(p0: Marker, p1: String, p2: Throwable) {
-    debug(p0, \ -> p1, p2)
+  function debug(p0: Marker, msg(): String, p2: Throwable) {
+    debugWithDecoration(p0, msg, p2, decorator())
+  }
+
+  /**
+   *  Log at the debug level.
+   */
+  override function debug(p0: Marker, msg: String, p2: Throwable) {
+    debugWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
@@ -364,273 +426,343 @@ class Logger implements org.slf4j.Logger {
   }
 
   /**
-   *  Log at the info level.
+   *  A private function to dispatch a logging statement.
    */
-  function info(msgBlock: block(): String) {
-    if ( InfoEnabled ) {
-      _logger.info("${LogDecorator()}${msgBlock()}")
+  private function infoWithDecoration(msgBlock(): String, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function infoWithDecoration(msgBlock(): String, p1: Object, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function infoWithDecoration(msgBlock(): String, p1: Object, p2: Object, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(decorateMsg(msgBlock(), decorator), p1, p2)
+    }
+  }
+
+  private function infoWithDecoration(msgBlock(): String, p1: Throwable, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function infoWithDecoration(p0: Marker, msgBlock(): String, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(p0, decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function infoWithDecoration(p0: Marker, msgBlock(): String, p2: Object, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function infoWithDecoration(p0: Marker, msgBlock(): String, p2: Object, p3: Object, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function infoWithDecoration(p0: Marker, msgBlock(): String, p2: Throwable, decorator(): String) {
+    if (InfoEnabled) {
+      _logger.info(p0, decorateMsg(msgBlock(), decorator), p2)
     }
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: String) {
-    info(\ -> p0)
+  function info(msg(): String) {
+    infoWithDecoration(msg, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(msgBlock: block(): String, p1: Object) {
-    if ( InfoEnabled ) {
-      _logger.info("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function info(msg: String) {
+    infoWithDecoration(\ -> msg, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: String, p1: Object) {
-    info(\ -> p0, p1)
+  function info(msg(): String, p1: Object) {
+    infoWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(msgBlock: block(): String, p1: Object, p2: Object) {
-    if ( InfoEnabled ) {
-      _logger.info("${LogDecorator()}${msgBlock()}", p1, p2)
-    }
+  override function info(msg: String, p1: Object) {
+    infoWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: String, p1: Object, p2: Object) {
-    info(\ -> p0, p1, p2)
+  function info(msg(): String, p1: Object, p2: Object) {
+    infoWithDecoration(msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(msgBlock: block(): String, p1: Throwable) {
-    if ( InfoEnabled ) {
-      _logger.info("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function info(msg: String, p1: Object, p2: Object) {
+    infoWithDecoration(\ -> msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: String, p1: Throwable) {
-    info(\ -> p0, p1)
+  function info(msg(): String, p1: Throwable) {
+    infoWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(p0: Marker, msgBlock: block(): String) {
-    if ( InfoEnabled ) {
-      _logger.info(p0, "${LogDecorator()}${msgBlock()}")
-    }
+  override function info(msg: String, p1: Throwable) {
+    infoWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: Marker, p1: String) {
-    info(p0, \ -> p1)
+  function info(p0: Marker, msg(): String) {
+    infoWithDecoration(p0, msg, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(p0: Marker, msgBlock: block(): String, p2: Object) {
-    if ( InfoEnabled ) {
-      _logger.info(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function info(p0: Marker, msg: String) {
+    infoWithDecoration(p0, \ -> msg, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: Marker, p1: String, p2: Object) {
-    info(p0, \ -> p1, p2)
+  function info(p0: Marker, msg(): String, p2: Object) {
+    infoWithDecoration(p0, msg, p2, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(p0: Marker, msgBlock: block(): String, p2: Object, p3: Object) {
-    if ( InfoEnabled ) {
-      _logger.info(p0, "${LogDecorator()}${msgBlock()}", p2, p3)
-    }
+  override function info(p0: Marker, msg: String, p2: Object) {
+    infoWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: Marker, p1: String, p2: Object, p3: Object) {
-    info(p0, \ -> p1, p2, p3)
+  function info(p0: Marker, msg(): String, p2: Object, p3: Object) {
+    infoWithDecoration(p0, msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  function info(p0: Marker, msgBlock: block(): String, p2: Throwable) {
-    if ( InfoEnabled ) {
-      _logger.info(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function info(p0: Marker, msg: String, p2: Object, p3: Object) {
+    infoWithDecoration(p0, \ -> msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the info level.
    */
-  override function info(p0: Marker, p1: String, p2: Throwable) {
-    info(p0, \ -> p1, p2)
+  function info(p0: Marker, msg(): String, p2: Throwable) {
+    infoWithDecoration(p0, msg, p2, decorator())
   }
 
   /**
-   *  Returns true if the warning level logging is enabled; false otherwise.
+   *  Log at the info level.
+   */
+  override function info(p0: Marker, msg: String, p2: Throwable) {
+    infoWithDecoration(p0, \ -> msg, p2, decorator())
+  }
+
+  /**
+   *  Returns true if the warn level logging is enabled; false otherwise.
    */
   override property get WarnEnabled(): boolean {
     return _logger.WarnEnabled
   }
 
   /**
-   *  Returns true if the warning level logging is enabled; false otherwise.
+   *  Returns true if the warn level logging is enabled; false otherwise.
    */
   override function isWarnEnabled(p0: Marker): boolean {
     return WarnEnabled
   }
 
   /**
-   *  Log at the warning level.
+   *  A private function to dispatch a logging statement.
    */
-  function warn(msgBlock: block(): String) {
-    if ( WarnEnabled ) {
-      _logger.warn("${LogDecorator()}${msgBlock()}")
+  private function warnWithDecoration(msgBlock(): String, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function warnWithDecoration(msgBlock(): String, p1: Object, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function warnWithDecoration(msgBlock(): String, p1: Object, p2: Object, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(decorateMsg(msgBlock(), decorator), p1, p2)
+    }
+  }
+
+  private function warnWithDecoration(msgBlock(): String, p1: Throwable, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function warnWithDecoration(p0: Marker, msgBlock(): String, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(p0, decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function warnWithDecoration(p0: Marker, msgBlock(): String, p2: Object, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function warnWithDecoration(p0: Marker, msgBlock(): String, p2: Object, p3: Object, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function warnWithDecoration(p0: Marker, msgBlock(): String, p2: Throwable, decorator(): String) {
+    if (WarnEnabled) {
+      _logger.warn(p0, decorateMsg(msgBlock(), decorator), p2)
     }
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: String) {
-    warn(\ -> p0)
+  function warn(msg(): String) {
+    warnWithDecoration(msg, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(msgBlock: block(): String, p1: Object) {
-    if ( WarnEnabled ) {
-      _logger.warn("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function warn(msg: String) {
+    warnWithDecoration(\ -> msg, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: String, p1: Object) {
-    warn(\ -> p0, p1)
+  function warn(msg(): String, p1: Object) {
+    warnWithDecoration(msg, p1, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(msgBlock: block(): String, p1: Object, p2: Object) {
-    if ( WarnEnabled ) {
-      _logger.warn("${LogDecorator()}${msgBlock()}", p1, p2)
-    }
+  override function warn(msg: String, p1: Object) {
+    warnWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: String, p1: Object, p2: Object) {
-    warn(\ -> p0, p1, p2)
+  function warn(msg(): String, p1: Object, p2: Object) {
+    warnWithDecoration(msg, p1, p2, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(msgBlock: block(): String, p1: Throwable) {
-    if ( WarnEnabled ) {
-      _logger.warn("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function warn(msg: String, p1: Object, p2: Object) {
+    warnWithDecoration(\ -> msg, p1, p2, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: String, p1: Throwable) {
-    warn(\ -> p0, p1)
+  function warn(msg(): String, p1: Throwable) {
+    warnWithDecoration(msg, p1, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(p0: Marker, msgBlock: block(): String) {
-    if ( WarnEnabled ) {
-      _logger.warn(p0, "${LogDecorator()}${msgBlock()}")
-    }
+  override function warn(msg: String, p1: Throwable) {
+    warnWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: Marker, p1: String) {
-    warn(p0, \ -> p1)
+  function warn(p0: Marker, msg(): String) {
+    warnWithDecoration(p0, msg, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(p0: Marker, msgBlock: block(): String, p2: Object) {
-    if ( WarnEnabled ) {
-      _logger.warn(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function warn(p0: Marker, msg: String) {
+    warnWithDecoration(p0, \ -> msg, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: Marker, p1: String, p2: Object) {
-    warn(p0, \ -> p1, p2)
+  function warn(p0: Marker, msg(): String, p2: Object) {
+    warnWithDecoration(p0, msg, p2, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(p0: Marker, msgBlock: block(): String, p2: Object, p3: Object) {
-    if ( WarnEnabled ) {
-      _logger.warn(p0, "${LogDecorator()}${msgBlock()}", p2, p3)
-    }
+  override function warn(p0: Marker, msg: String, p2: Object) {
+    warnWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: Marker, p1: String, p2: Object, p3: Object) {
-    warn(p0, \ -> p1, p2, p3)
+  function warn(p0: Marker, msg(): String, p2: Object, p3: Object) {
+    warnWithDecoration(p0, msg, p2, p3, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  function warn(p0: Marker, msgBlock: block(): String, p2: Throwable) {
-    if ( WarnEnabled ) {
-      _logger.warn(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function warn(p0: Marker, msg: String, p2: Object, p3: Object) {
+    warnWithDecoration(p0, \ -> msg, p2, p3, decorator())
   }
 
   /**
-   *  Log at the warning level.
+   *  Log at the warn level.
    */
-  override function warn(p0: Marker, p1: String, p2: Throwable) {
-    warn(p0, \ -> p1, p2)
+  function warn(p0: Marker, msg(): String, p2: Throwable) {
+    warnWithDecoration(p0, msg, p2, decorator())
+  }
+
+  /**
+   *  Log at the warn level.
+   */
+  override function warn(p0: Marker, msg: String, p2: Throwable) {
+    warnWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
@@ -648,130 +780,165 @@ class Logger implements org.slf4j.Logger {
   }
 
   /**
-   *  Log at the error level.
+   *  A private function to dispatch a logging statement.
    */
-  function error(msgBlock: block(): String) {
-    if ( ErrorEnabled ) {
-      _logger.error("${LogDecorator()}${msgBlock()}")
+  private function errorWithDecoration(msgBlock(): String, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function errorWithDecoration(msgBlock(): String, p1: Object, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function errorWithDecoration(msgBlock(): String, p1: Object, p2: Object, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(decorateMsg(msgBlock(), decorator), p1, p2)
+    }
+  }
+
+  private function errorWithDecoration(msgBlock(): String, p1: Throwable, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(decorateMsg(msgBlock(), decorator), p1)
+    }
+  }
+
+  private function errorWithDecoration(p0: Marker, msgBlock(): String, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(p0, decorateMsg(msgBlock(), decorator))
+    }
+  }
+
+  private function errorWithDecoration(p0: Marker, msgBlock(): String, p2: Object, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function errorWithDecoration(p0: Marker, msgBlock(): String, p2: Object, p3: Object, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(p0, decorateMsg(msgBlock(), decorator), p2)
+    }
+  }
+
+  private function errorWithDecoration(p0: Marker, msgBlock(): String, p2: Throwable, decorator(): String) {
+    if (ErrorEnabled) {
+      _logger.error(p0, decorateMsg(msgBlock(), decorator), p2)
     }
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: String) {
-    error(\ -> p0)
+  function error(msg(): String) {
+    errorWithDecoration(msg, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(msgBlock: block(): String, p1: Object) {
-    if ( ErrorEnabled ) {
-      _logger.error("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function error(msg: String) {
+    errorWithDecoration(\ -> msg, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: String, p1: Object) {
-    error(\ -> p0, p1)
+  function error(msg(): String, p1: Object) {
+    errorWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(msgBlock: block(): String, p1: Object, p2: Object) {
-    if ( ErrorEnabled ) {
-      _logger.error("${LogDecorator()}${msgBlock()}", p1, p2)
-    }
+  override function error(msg: String, p1: Object) {
+    errorWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: String, p1: Object, p2: Object) {
-    error(\ -> p0, p1, p2)
+  function error(msg(): String, p1: Object, p2: Object) {
+    errorWithDecoration(msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(msgBlock: block(): String, p1: Throwable) {
-    if ( ErrorEnabled ) {
-      _logger.error("${LogDecorator()}${msgBlock()}", p1)
-    }
+  override function error(msg: String, p1: Object, p2: Object) {
+    errorWithDecoration(\ -> msg, p1, p2, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: String, p1: Throwable) {
-    error(\ -> p0, p1)
+  function error(msg(): String, p1: Throwable) {
+    errorWithDecoration(msg, p1, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(p0: Marker, msgBlock: block(): String) {
-    if ( ErrorEnabled ) {
-      _logger.error(p0, "${LogDecorator()}${msgBlock()}")
-    }
+  override function error(msg: String, p1: Throwable) {
+    errorWithDecoration(\ -> msg, p1, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: Marker, p1: String) {
-    error(p0, \ -> p1)
+  function error(p0: Marker, msg(): String) {
+    errorWithDecoration(p0, msg, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(p0: Marker, msgBlock: block(): String, p2: Object) {
-    if ( ErrorEnabled ) {
-      _logger.error(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function error(p0: Marker, msg: String) {
+    errorWithDecoration(p0, \ -> msg, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: Marker, p1: String, p2: Object) {
-    error(p0, \ -> p1, p2)
+  function error(p0: Marker, msg(): String, p2: Object) {
+    errorWithDecoration(p0, msg, p2, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(p0: Marker, msgBlock: block(): String, p2: Object, p3: Object) {
-    if ( ErrorEnabled ) {
-      _logger.error(p0, "${LogDecorator()}${msgBlock()}", p2, p3)
-    }
+  override function error(p0: Marker, msg: String, p2: Object) {
+    errorWithDecoration(p0, \ -> msg, p2, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: Marker, p1: String, p2: Object, p3: Object) {
-    error(p0, \ -> p1, p2, p3)
+  function error(p0: Marker, msg(): String, p2: Object, p3: Object) {
+    errorWithDecoration(p0, msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  function error(p0: Marker, msgBlock: block(): String, p2: Throwable) {
-    if ( ErrorEnabled ) {
-      _logger.error(p0, "${LogDecorator()}${msgBlock()}", p2)
-    }
+  override function error(p0: Marker, msg: String, p2: Object, p3: Object) {
+    errorWithDecoration(p0, \ -> msg, p2, p3, decorator())
   }
 
   /**
    *  Log at the error level.
    */
-  override function error(p0: Marker, p1: String, p2: Throwable) {
-    error(p0, \ -> p1, p2)
+  function error(p0: Marker, msg(): String, p2: Throwable) {
+    errorWithDecoration(p0, msg, p2, decorator())
+  }
+
+  /**
+   *  Log at the error level.
+   */
+  override function error(p0: Marker, msg: String, p2: Throwable) {
+    errorWithDecoration(p0, \ -> msg, p2, decorator())
   }
 }
