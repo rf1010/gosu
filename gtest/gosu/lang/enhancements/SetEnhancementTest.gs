@@ -16,7 +16,7 @@ class SetEnhancementTest extends TestBase {
     var _newSet = { "A", "B", "C", "D" }.toSet()
     var _origSet = { "D", "B", "C" }.toSet()
 
-    var actualComparisonResult = _newSet.compareTo_Ext(_origSet)
+    var actualComparisonResult = _newSet.compareTo_ext(_origSet)
 
     var expectedComparisonResult = new SetComparisonResult<String>()
     expectedComparisonResult.appendToAdded({"A"})
@@ -33,7 +33,7 @@ class SetEnhancementTest extends TestBase {
     var _newSet = { "A", "B", "C", "D" }.toSet()
     var _origSet = { "D", "B", "C" }.toSet()
 
-    var actualComparisonResult = _newSet.compareTo_Ext(_origSet)
+    var actualComparisonResult = _newSet.compareTo_ext(_origSet)
 
     var expectedComparisonResult = new SetComparisonResult<String>()
     expectedComparisonResult.appendToAdded({"A"})
@@ -50,7 +50,7 @@ class SetEnhancementTest extends TestBase {
     var _newSet = { "A", "B", "C" }.toSet()
     var _origSet = { "D", "B", "C" }.toSet()
 
-    var actualComparisonResult = _newSet.compareTo_Ext(_origSet)
+    var actualComparisonResult = _newSet.compareTo_ext(_origSet)
 
     var expectedComparisonResult = new SetComparisonResult<String>()
     expectedComparisonResult.appendToAdded({"A"})

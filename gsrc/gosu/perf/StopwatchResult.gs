@@ -10,7 +10,7 @@ uses java.util.concurrent.TimeUnit
  *   Represents the results of stopwatch measurement, including the results from the initial run,
  *   the results from the final warmed-up run, and the speedup.
  */
-internal class StopwatchResult<A> {
+class StopwatchResult<A> {
 
   private var _initialResult: A = null
   private var _initialDuration: Long = null
@@ -100,14 +100,14 @@ internal class StopwatchResult<A> {
    *  DAYS -> 1, HOURS -> 20, MINUTES -> 30, etc.
    */
   property get DurationTimeUnit(): Map<TimeUnit, Long> {
-    return Date.computeDurationTimeUnits_Ext(Duration, TimeUnit.NANOSECONDS)
+    return Date.computeDurationTimeUnits_ext(Duration, TimeUnit.NANOSECONDS)
   }
 
   /**
    *  Returns the duration of operation formatted as a display string.
    */
   property get DurationDisplayValue(): String {
-    return Date.getDurationAsString_Ext(Duration, TimeUnit.NANOSECONDS)
+    return Date.getDurationAsString_ext(Duration, TimeUnit.NANOSECONDS)
   }
 
   /**
