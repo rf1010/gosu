@@ -1,10 +1,9 @@
 package gosu.typesystem
 
-uses gw.lang.reflect.TypeSystem
 uses gw.lang.reflect.IConstructorInfo
-uses gw.lang.reflect.IType
-uses gw.lang.reflect.gs.IGosuObject
+uses gw.lang.reflect.TypeSystem
 uses gosu.functional.Validation
+uses gw.lang.reflect.IType
 
 /**
  *  A collection of functions to support operations with TypeSystem, i.e. get an instance of a class by class name.
@@ -39,9 +38,9 @@ class TypeSystemUtil {
   @Param("className", "The fully qualified name of the class")
   @Param("params", "An array of parameters to pass to constructor")
   @Returns("An instance of a class")
-  static function getInstanceByClassName(className: String, params: Object[]): IGosuObject {
+  static function getInstanceByClassName(className: String, params: Object[]): gw.lang.reflect.gs.IGosuObject {
     var callableConstructor = getConstructorByClassName(className, params.length)
-    var gosuClassInstance = callableConstructor.getConstructor().newInstance( params ) as IGosuObject
+    var gosuClassInstance = callableConstructor.getConstructor().newInstance( params ) as gw.lang.reflect.gs.IGosuObject
     Validation.require(\ -> gosuClassInstance != null, "Failed to initialize an object of class ${className}")
     return gosuClassInstance
   }
@@ -51,7 +50,7 @@ class TypeSystemUtil {
    */
   @Param("className", "The fully qualified name of the class")
   @Returns("An instance of a class")
-  static function getInstanceByClassName(className: String): IGosuObject {
+  static function getInstanceByClassName(className: String): gw.lang.reflect.gs.IGosuObject {
     return getInstanceByClassName(className, new Object[0])
   }
 
@@ -63,5 +62,16 @@ class TypeSystemUtil {
   static function getClassNameFromType(type: IType): String {
     var fullClassName = type.DisplayName
     return fullClassName.match("(.+?)\\s*?(<.+?>)?\\s*?(\\(.+?\\))?").Groups?.first()
+  }
+
+  /**
+   *  Returns true if any of the declared methods of a class has the UnstableAPI annotation.
+   */
+  @Param("iType", "IType")
+  @Returns("True if any of the declared methods have the UnstableAPI annotation")
+  static function hasUnstableAPI(iType: IType): boolean {
+    return iType.TypeInfo.Methods.hasMatch(\method ->
+        method.DeclaredAnnotations.hasMatch(\annotation ->
+            annotation.Type == gw.lang.UnstableAPI))
   }
 }
