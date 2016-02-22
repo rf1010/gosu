@@ -1,0 +1,14 @@
+.DS_Store
+config/
+configuration.iml
+deploy/
+etc/
+gsrc/com/
+gsrc/gw/
+gsrc/wsi/
+out/
+pom.xml
+product.properties
+sampledata/
+webresources/
+xsd/
