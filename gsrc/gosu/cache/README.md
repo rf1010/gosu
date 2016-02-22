@@ -18,13 +18,13 @@ For most common usage patterns, please see the tests (`gtest/gosu/cache/CacheTes
 implementation for the Singleton pattern in Gosu (it relies on the order of static initializers on JVM).
 
 Be careful with other Singleton patterns, such as a final static variable
-`
+```
 final static var _cache: ICache = new CacheImpl()
-`
+```
 as it does not work correctly in highly concurrent environments.
 
 #### Usage Example
-`
+```
 var cache = CacheBuilder
     .newBuilder<Integer, String>()
     .withExpireAfterAccess(15, TimeUnit.MINUTES)
@@ -32,7 +32,7 @@ var cache = CacheBuilder
     .withRecordCacheStatistics()
     .withCacheMissHandler(\key: Integer -> handleCacheMiss(key))
     .build()
-`
+```
 
 `newBuilder<Integer, String>()`: the cache will have Integer as a key, and String as a value (substitute for correct
 types in your use case
