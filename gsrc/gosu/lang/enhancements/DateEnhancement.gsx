@@ -7,6 +7,7 @@ uses java.util.Map
 uses java.lang.Long
 uses java.util.concurrent.TimeUnit
 uses java.util.Date
+uses java.text.SimpleDateFormat
 
 enhancement DateEnhancement: java.util.Date {
 
@@ -185,6 +186,15 @@ enhancement DateEnhancement: java.util.Date {
   @Returns("A map structure which links time units to the calculated numerical values, e.g. DAYS -> 10, HOURS -> 1, etc.")
   static function computeDurationTimeUnits_ext(startDate: Date, endDate: Date): Map<TimeUnit,Long> {
     return computeDurationTimeUnits_ext(startDate?.Time, endDate?.Time, TimeUnit.MILLISECONDS)
+  }
+
+  /**
+   *  Formats a date as a string using either the specified format, or the default.
+   */
+  function asString_ext(usingFormat: String =  null): String {
+    var formatToUse = usingFormat != null ? usingFormat : "yyyy-MM-dd"
+    var dateFormatter = new SimpleDateFormat(formatToUse)
+    return dateFormatter.format(this)
   }
 
   /**

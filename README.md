@@ -181,7 +181,7 @@ print (Date.getDurationAsString_Ext(date1, date2))
 ```
 
 ### Performance Measurement
-####Stopwatch
+#### Stopwatch
 `Stopwatch.measureExecutionDuration(runnable(): A)` allows to measure the time it takes it execute runnable and obtain its result. `Stopwatch.measureWarmedExecutionDuration(runnable(): A)` runs runnable X number of times (default is 200) to ensure that the JVM optimizations compiled it to native code and reports the results, including the speedup relative to the very first invocation.
 
 Sample usage:
@@ -198,6 +198,49 @@ var result = Stopwatch.measureWarmedExecutionDuration(\ -> doWork(10000))
 print (result.DurationDisplayValue)
 // 0 Days 0 Hours 0 Minutes 0 Seconds 6 Milliseconds 120 Microseconds 0 Nanoseconds
 ```
+
+#### Performance Capture
+In most modern applications, ongoing performance management is of a paramount concern, but the answer is not
+as easy as it may seem, especially, if the orchestrated process involves multiple (asynchronous) function calls.
+
+The performance capturing tool allows you to place performance capturing code in some key strategic points, like so:
+```
+Perf.INSTANCE.measure(businessID, MyWebService, "doProcessRequest", \ -> MyWebService.doProcessRequest()
+```
+It is similar to a performance profiler provided by Guidewire, but it is different in its intent: profiling tools
+are used to troubleshoot problems and in this capacity their impact on performance is a secondary concern.
+Performance capturing tools are meant to capture statistics with minimal impact on the system performance and is
+therefore useful in Production environments.
+
+For this reason, the performance capturing tool's implementation evaluates the "measured" code paths very quickly and
+off-loads the writing of statistics to the separate statistics capturing component. In the included reference
+implementation, the performance capturing tool is writing collected performance statistics
+to the CSV files. The CSVWriter can be swapped for any other implementation.
+
+The back-pressure is controlled by the size of the performance buffer (implemented as a circular buffer). If the
+performance events are coming in at a very high rate, or the buffered results are not processed quickly enough,
+the oldest elements are simply dropped. This may be mitigated by increasing the size of the buffer (by default,
+it can accommodate up to 1,000 results). The results captured in a buffer are processed by a separate background thread.
+
+#### Tool Usage
+```
+Perf.INSTANCE.measure(businessID, MyWebService, "doProcessRequest", \ -> MyWebService.doProcessRequest()
+```
+
+The `measure` function returns the type returned by the `\ -> MyWebService.doProcessRequest()` block, so it is
+very easy to inject this anywhere you call `MyWebService.doProcessRequest()`.
+
+`businessID` is a business identifier used to identify an event, e.g. Quote ID. It is used as an identifier on
+which the results of calling `MyWebService.doProcessRequest()` multiple times may be aggregated to calculate the
+min, max, average, etc.
+
+`MyWebService` is the class being measured.
+
+`doProcessRequest` is usually the function name being measured, but can be anything, as it is represented by a string.
+
+`\ -> MyWebService.doProcessRequest()` is a block which returns some result. This is the code which is being measured.
+The results are reported in milliseconds.
+
 
 ### Stack Trace Element Decorator
 `StackTraceElementEnhancement` allows the selection of a stack trace element using the offset relative to some base stack trace frame  and "decorate" it with additional properties, such as package name, class name, function name, etc. It is used in the logger implementation to customize the format of a log entry but can be used generically. 
