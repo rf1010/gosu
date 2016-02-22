@@ -270,4 +270,10 @@ a big issue, and this should be activated if you are using cache statistics in y
 It gets called every time the key is not found in cache.
 
 `build()`: returns the instance of Cache.
- 
+
+### ClassLoaderUtil
+Contains a variety of functions and properties to troubleshoot class loading on a JVM.
+
+`ClassLoaderUtil.LoadedClassesByClassLoader` returns the list of classes loaded by each class loader.
+
+`ClassLoaderUtil.getClassInterfaces(clz: Class)` returns the list of interfaces for a class.
