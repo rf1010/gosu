@@ -241,7 +241,7 @@ final static var _cache: ICache = new CacheImpl()
 as it does not work correctly in highly concurrent environments.
 
 #### Usage Example
-`
+```
 var cache = CacheBuilder
     .newBuilder<Integer, String>()
     .withExpireAfterAccess(15, TimeUnit.MINUTES)
@@ -249,7 +249,7 @@ var cache = CacheBuilder
     .withRecordCacheStatistics()
     .withCacheMissHandler(\key: Integer -> handleCacheMiss(key))
     .build()
-`
+```
 
 `newBuilder<Integer, String>()`: the cache will have Integer as a key, and String as a value (substitute for correct
 types in your use case
