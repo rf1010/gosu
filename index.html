@@ -1,33 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Gosu by rf1010</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Gosu</h1>
-        <p>Extensions to standard gosu libraries</p>
-        <p class="view"><a href="https://github.com/rf1010/gosu">View the Project on GitHub <small>rf1010/gosu</small></a></p>
-        <ul>
-          <li><a href="https://github.com/rf1010/gosu/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/rf1010/gosu/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/rf1010/gosu">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
+    <section class="page-header">
+      <h1 class="project-name">Gosu</h1>
+      <h2 class="project-tagline">Extensions to standard gosu libraries</h2>
+      <a href="https://github.com/rf1010/gosu" class="btn">View on GitHub</a>
+      <a href="https://github.com/rf1010/gosu/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/rf1010/gosu/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
 <a id="gosu" class="anchor" href="#gosu" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>gosu</h1>
 
 <p>Provides extendions to standard gosu libraries.</p>
@@ -265,6 +257,52 @@ print (result.DurationDisplayValue)
 // 0 Days 0 Hours 0 Minutes 0 Seconds 6 Milliseconds 120 Microseconds 0 Nanoseconds
 </code></pre>
 
+<h4>
+<a id="performance-capture" class="anchor" href="#performance-capture" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Performance Capture</h4>
+
+<p>In most modern applications, ongoing performance management is of a paramount concern, but the answer is not
+as easy as it may seem, especially, if the orchestrated process involves multiple (asynchronous) function calls.</p>
+
+<p>The performance capturing tool allows you to place performance capturing code in some key strategic points, like so:</p>
+
+<pre><code>Perf.INSTANCE.measure(businessID, MyWebService, "doProcessRequest", \ -&gt; MyWebService.doProcessRequest()
+</code></pre>
+
+<p>It is similar to a performance profiler provided by Guidewire, but it is different in its intent: profiling tools
+are used to troubleshoot problems and in this capacity their impact on performance is a secondary concern.
+Performance capturing tools are meant to capture statistics with minimal impact on the system performance and is
+therefore useful in Production environments.</p>
+
+<p>For this reason, the performance capturing tool's implementation evaluates the "measured" code paths very quickly and
+off-loads the writing of statistics to the separate statistics capturing component. In the included reference
+implementation, the performance capturing tool is writing collected performance statistics
+to the CSV files. The CSVWriter can be swapped for any other implementation.</p>
+
+<p>The back-pressure is controlled by the size of the performance buffer (implemented as a circular buffer). If the
+performance events are coming in at a very high rate, or the buffered results are not processed quickly enough,
+the oldest elements are simply dropped. This may be mitigated by increasing the size of the buffer (by default,
+it can accommodate up to 1,000 results). The results captured in a buffer are processed by a separate background thread.</p>
+
+<h4>
+<a id="tool-usage" class="anchor" href="#tool-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tool Usage</h4>
+
+<pre><code>Perf.INSTANCE.measure(businessID, MyWebService, "doProcessRequest", \ -&gt; MyWebService.doProcessRequest()
+</code></pre>
+
+<p>The <code>measure</code> function returns the type returned by the <code>\ -&gt; MyWebService.doProcessRequest()</code> block, so it is
+very easy to inject this anywhere you call <code>MyWebService.doProcessRequest()</code>.</p>
+
+<p><code>businessID</code> is a business identifier used to identify an event, e.g. Quote ID. It is used as an identifier on
+which the results of calling <code>MyWebService.doProcessRequest()</code> multiple times may be aggregated to calculate the
+min, max, average, etc.</p>
+
+<p><code>MyWebService</code> is the class being measured.</p>
+
+<p><code>doProcessRequest</code> is usually the function name being measured, but can be anything, as it is represented by a string.</p>
+
+<p><code>\ -&gt; MyWebService.doProcessRequest()</code> is a block which returns some result. This is the code which is being measured.
+The results are reported in milliseconds.</p>
+
 <h3>
 <a id="stack-trace-element-decorator" class="anchor" href="#stack-trace-element-decorator" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stack Trace Element Decorator</h3>
 
@@ -281,14 +319,89 @@ print (result.DurationDisplayValue)
 
 print (stackTraceLine)
 </code></pre>
-      </section>
-    </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/rf1010">rf1010</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
+
+<h3>
+<a id="gosu-builder-for-google-guava-cache" class="anchor" href="#gosu-builder-for-google-guava-cache" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gosu Builder for Google Guava Cache</h3>
+
+<h4>
+<a id="what" class="anchor" href="#what" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What</h4>
+
+<p>This package contains Gosu classes which make the use of Google Guava cache from Gosu simpler
+for Gosu developers, as it is using the familiar "builder" interface. In fact, it is a wrapper for
+Google Guava cache builder API, with sensible defaults and ability to overwrite cache parameters.</p>
+
+<h4>
+<a id="why" class="anchor" href="#why" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why</h4>
+
+<p>Guidewire provides its own implementation of Cache in the <code>gw.util.concurrent.Cache</code> package. However,
+it does not provide API for defining cache eviction strategies (e.g. expire cache after 15 minutes).</p>
+
+<p>Google Guava cache implementation provides time-based eviction capabilities and therefore is more appropriate
+in most cases.</p>
+
+<h4>
+<a id="how" class="anchor" href="#how" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How</h4>
+
+<p>For most common usage patterns, please see the tests (<code>gtest/gosu/cache/CacheTest</code>) and the cache implementation in
+<code>SimpleCacheImpl</code>. You would likely want to use a singleton pattern. SimpleCacheImpl provides a reference
+implementation for the Singleton pattern in Gosu (it relies on the order of static initializers on JVM).</p>
+
+<p>Be careful with other Singleton patterns, such as a final static variable
+<code>
+final static var _cache: ICache = new CacheImpl()
+</code>
+as it does not work correctly in highly concurrent environments.</p>
+
+<h4>
+<a id="usage-example" class="anchor" href="#usage-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage Example</h4>
+
+<pre><code>var cache = CacheBuilder
+    .newBuilder&lt;Integer, String&gt;()
+    .withExpireAfterAccess(15, TimeUnit.MINUTES)
+    .withMaxSize(10)
+    .withRecordCacheStatistics()
+    .withCacheMissHandler(\key: Integer -&gt; handleCacheMiss(key))
+    .build()
+</code></pre>
+
+<p><code>newBuilder&lt;Integer, String&gt;()</code>: the cache will have Integer as a key, and String as a value (substitute for correct
+types in your use case</p>
+
+<p><code>withExpireAfterAccess(15, TimeUnit.MINUTES)</code>: will expire cache 15 minutes after last access (i.e. will evict
+a key-value from the cache). There are other options for eviction strategies, such as withExpireAfterWrite,
+withRefreshAfterWrite. For details, please see Google Guava cache documentation:
+<a href="https://github.com/google/guava/wiki/CachesExplained">https://github.com/google/guava/wiki/CachesExplained</a></p>
+
+<p><code>withMaxSize(10)</code>: the maximum size of cache (i.e. the number of unique keys).</p>
+
+<p><code>withRecordCacheStatistics()</code>: activates the cache statistics which one can query at runtime (e.g. collects
+information on cache misses, hits, etc.); if activated, it is available in <code>Cache.stats()</code>. Note: this is NOT
+activated by default for performance reasons. However, in most Guidewire implementations, performance won't be
+a big issue, and this should be activated if you are using cache statistics in your code.</p>
+
+<p><code>withCacheMissHandler</code>: accepts a block which takes the key as a parameter and returns the value to be cached.
+It gets called every time the key is not found in cache.</p>
+
+<p><code>build()</code>: returns the instance of Cache.</p>
+
+<h3>
+<a id="classloaderutil" class="anchor" href="#classloaderutil" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ClassLoaderUtil</h3>
+
+<p>Contains a variety of functions and properties to troubleshoot class loading on a JVM.</p>
+
+<p><code>ClassLoaderUtil.LoadedClassesByClassLoader</code> returns the list of classes loaded by each class loader.</p>
+
+<p><code>ClassLoaderUtil.getClassInterfaces(clz: Class)</code> returns the list of interfaces for a class.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/rf1010/gosu">Gosu</a> is maintained by <a href="https://github.com/rf1010">rf1010</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
