@@ -1,31 +1,39 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Gosu by rf1010</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">Gosu</h1>
-      <h2 class="project-tagline">Extensions to standard gosu libraries</h2>
-      <a href="https://github.com/rf1010/gosu" class="btn">View on GitHub</a>
-      <a href="https://github.com/rf1010/gosu/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/rf1010/gosu/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
-
-    <section class="main-content">
-      <h1>
-<a id="gosu" class="anchor" href="#gosu" aria-hidden="true"><span class="octicon octicon-link"></span></a>gosu</h1>
+    <div class="wrapper">
+      <header>
+        <h1>Gosu</h1>
+        <p>Extensions to standard gosu libraries</p>
+        <p class="view"><a href="https://github.com/rf1010/gosu">View the Project on GitHub <small>rf1010/gosu</small></a></p>
+        <ul>
+          <li><a href="https://github.com/rf1010/gosu/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/rf1010/gosu/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/rf1010/gosu">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="gosu" class="anchor" href="#gosu" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>gosu</h1>
 
 <p>Provides extendions to standard gosu libraries.</p>
 
 <h3>
-<a id="validation" class="anchor" href="#validation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Validation</h3>
+<a id="validation" class="anchor" href="#validation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Validation</h3>
 
 <p><code>Validation.require()</code>  is a syntactic sugar for validation code which throws exceptions (e.g. validating that the function input is correct). For example:</p>
 
@@ -44,10 +52,10 @@
 <p>The class also allows for construction of other exceptions or executing alternative flows if the condition does not evaluate to true.</p>
 
 <h3>
-<a id="algebraic-data-types-atds" class="anchor" href="#algebraic-data-types-atds" aria-hidden="true"><span class="octicon octicon-link"></span></a>Algebraic Data Types (ATDs)</h3>
+<a id="algebraic-data-types-atds" class="anchor" href="#algebraic-data-types-atds" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Algebraic Data Types (ATDs)</h3>
 
 <h4>
-<a id="tuples" class="anchor" href="#tuples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tuples</h4>
+<a id="tuples" class="anchor" href="#tuples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tuples</h4>
 
 <p>Tuple is an ordered list of elements in which elements can be of different types. The element projections (typed values) are exposed as ElementN where N ranges from 1 to max dimension or arity.  Tuples are useful as composite type constructors which contain proper equals() and hashCode() implementations, which make them usable as composite keys in HashMaps, Sets, etc. However, caution should be exercised at high arities, as tuples inhibit understanding of code (e.g. what does Tuple10.Element10 mean?).</p>
 
@@ -78,10 +86,10 @@ print (result2.Element2()) // evaluate Element1() - returns 1
 <p>After the tuple classes are generated, they may be checked-in into the source control repository. Direct editing of tuple classes is discouraged.</p>
 
 <h3>
-<a id="concurrency" class="anchor" href="#concurrency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Concurrency</h3>
+<a id="concurrency" class="anchor" href="#concurrency" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Concurrency</h3>
 
 <h4>
-<a id="concurrentrunner" class="anchor" href="#concurrentrunner" aria-hidden="true"><span class="octicon octicon-link"></span></a>ConcurrentRunner</h4>
+<a id="concurrentrunner" class="anchor" href="#concurrentrunner" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ConcurrentRunner</h4>
 
 <p><code>ConcurrentRunner</code> provides an implementation for parallelizing work. It allows submission of callables for execution (in separate threads). It can then optionally block the current thread until the work submitted in separate threads is completed (successfully or not (failed, time-out, etc)). <code>ConcurrentRunner</code> knows how to manage the thread pool: by default, it destroys threads after all callables are completed, but they can be set for thread re-use, if necessary.</p>
 
@@ -109,14 +117,14 @@ print(resultCount) // prints the count of successful results
 </code></pre>
 
 <h4>
-<a id="contextawareconcurrentrunner" class="anchor" href="#contextawareconcurrentrunner" aria-hidden="true"><span class="octicon octicon-link"></span></a>ContextAwareConcurrentRunner</h4>
+<a id="contextawareconcurrentrunner" class="anchor" href="#contextawareconcurrentrunner" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ContextAwareConcurrentRunner</h4>
 
 <p><code>ContextAwareConcurrentRunner</code> extends the functionality of <code>ConcurrentRunner</code> by providing the provisions to specify a bundle and/or a user which should be used for running callables. Notice that all callables are run in the same bundle and user context. By default, the user context is that of a current user, and the bundle is the "current" bundle, if it is writable, and a new bundle, if it is not.</p>
 
 <p>Most Guidewire implementations will prefer to use ContextAwareConcurrentRunner, since callables typically create new entities or modify them.</p>
 
 <h3>
-<a id="logging" class="anchor" href="#logging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Logging</h3>
+<a id="logging" class="anchor" href="#logging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logging</h3>
 
 <p><code>Logger</code> contains an implementation of org.slf4j.Logger and various predefined logging categories.</p>
 
@@ -146,7 +154,7 @@ logger.debug(\ -&gt; "Started")
 </code></pre>
 
 <h3>
-<a id="type-system" class="anchor" href="#type-system" aria-hidden="true"><span class="octicon octicon-link"></span></a>Type System</h3>
+<a id="type-system" class="anchor" href="#type-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Type System</h3>
 
 <p><code>TypeSystemUtil</code> allows reflective construction of objects by their class names. </p>
 
@@ -158,10 +166,10 @@ return TypeSystemUtil.getInstanceByClassName(className, params) as Tuple2
 </code></pre>
 
 <h3>
-<a id="comparators" class="anchor" href="#comparators" aria-hidden="true"><span class="octicon octicon-link"></span></a>Comparators</h3>
+<a id="comparators" class="anchor" href="#comparators" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Comparators</h3>
 
 <h4>
-<a id="assumematchiftargetnotsetcomparator" class="anchor" href="#assumematchiftargetnotsetcomparator" aria-hidden="true"><span class="octicon octicon-link"></span></a>AssumeMatchIfTargetNotSetComparator</h4>
+<a id="assumematchiftargetnotsetcomparator" class="anchor" href="#assumematchiftargetnotsetcomparator" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>AssumeMatchIfTargetNotSetComparator</h4>
 
 <p><code>AssumeMatchIfTargetNotSetComparator</code> is the implementation which bypasses equality checks between a criteria and a target if the target is not set; it simply returns true. However, if the target is set, then the criteria must be equal to the target. Equality is assessed via a collection of functions ranging from a simple <code>equals()</code> to more sophisticated <code>equalsAsCaseInsensitiveString()</code>, <code>equalsAsCaseSensitiveString()</code>, <code>equalsAsCaseInsensitiveNoWhitespaceString()</code>, <code>startsWithAsCaseSensitiveString()</code>, etc. </p>
 
@@ -184,7 +192,7 @@ print (result3)  //false
 </code></pre>
 
 <h4>
-<a id="set-comparison" class="anchor" href="#set-comparison" aria-hidden="true"><span class="octicon octicon-link"></span></a>Set Comparison</h4>
+<a id="set-comparison" class="anchor" href="#set-comparison" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Set Comparison</h4>
 
 <p><code>SetEnhancement</code> compares <code>that</code> to <code>this</code> set and returns a result which contains elements which were added, removed, or unchanged as collection properties.</p>
 
@@ -199,10 +207,10 @@ print (result.Unchanged.join(", "))       // D, B, C
 </code></pre>
 
 <h3>
-<a id="enhancements" class="anchor" href="#enhancements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Enhancements</h3>
+<a id="enhancements" class="anchor" href="#enhancements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Enhancements</h3>
 
 <h4>
-<a id="iterablefirstnotnull_ext" class="anchor" href="#iterablefirstnotnull_ext" aria-hidden="true"><span class="octicon octicon-link"></span></a>Iterable.firstNotNull_ext()</h4>
+<a id="iterablefirstnotnull_ext" class="anchor" href="#iterablefirstnotnull_ext" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Iterable.firstNotNull_ext()</h4>
 
 <p><code>Iterable.firstNotNull_ext()</code> iterates over each element of an iterable until it finds a value which is not null. If the iterable contains blocks, evaluates blocks until it finds the one which returns a value which is not null and returns that value. </p>
 
@@ -220,7 +228,7 @@ print (result2) // B
 </code></pre>
 
 <h4>
-<a id="javautildate-enhancements" class="anchor" href="#javautildate-enhancements" aria-hidden="true"><span class="octicon octicon-link"></span></a>java.util.Date Enhancements</h4>
+<a id="javautildate-enhancements" class="anchor" href="#javautildate-enhancements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>java.util.Date Enhancements</h4>
 
 <p><code>java.util.Date</code> is enhanced with static functions to calculate duration between two dates, as well as customizable user-friendly formatting, e.g. 1 Day 5 Hours 10 Minutes, etc.</p>
 
@@ -235,10 +243,10 @@ print (Date.getDurationAsString_Ext(date1, date2))
 </code></pre>
 
 <h3>
-<a id="performance-measurement" class="anchor" href="#performance-measurement" aria-hidden="true"><span class="octicon octicon-link"></span></a>Performance Measurement</h3>
+<a id="performance-measurement" class="anchor" href="#performance-measurement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Performance Measurement</h3>
 
 <h4>
-<a id="stopwatch" class="anchor" href="#stopwatch" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stopwatch</h4>
+<a id="stopwatch" class="anchor" href="#stopwatch" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stopwatch</h4>
 
 <p><code>Stopwatch.measureExecutionDuration(runnable(): A)</code> allows to measure the time it takes it execute runnable and obtain its result. <code>Stopwatch.measureWarmedExecutionDuration(runnable(): A)</code> runs runnable X number of times (default is 200) to ensure that the JVM optimizations compiled it to native code and reports the results, including the speedup relative to the very first invocation.</p>
 
@@ -258,7 +266,7 @@ print (result.DurationDisplayValue)
 </code></pre>
 
 <h3>
-<a id="stack-trace-element-decorator" class="anchor" href="#stack-trace-element-decorator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stack Trace Element Decorator</h3>
+<a id="stack-trace-element-decorator" class="anchor" href="#stack-trace-element-decorator" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stack Trace Element Decorator</h3>
 
 <p><code>StackTraceElementEnhancement</code> allows the selection of a stack trace element using the offset relative to some base stack trace frame  and "decorate" it with additional properties, such as package name, class name, function name, etc. It is used in the logger implementation to customize the format of a log entry but can be used generically. </p>
 
@@ -273,16 +281,14 @@ print (result.DurationDisplayValue)
 
 print (stackTraceLine)
 </code></pre>
-
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/rf1010/gosu">Gosu</a> is maintained by <a href="https://github.com/rf1010">rf1010</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-            <script type="text/javascript">
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/rf1010">rf1010</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -295,4 +301,3 @@ print (stackTraceLine)
 
   </body>
 </html>
-
