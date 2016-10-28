@@ -1,11 +1,15 @@
-# gosu
-Provides extendions to standard gosu libraries.
+# gosu-lang-ext
+Provides extensions to the standard [gosu-lang](https://github.com/gosu-lang/gosu-lang "gosu-lang") libraries.
+
+## License
+
+Released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0.txt "License").
 
 ### Validation
 `Validation.require()`  is a syntactic sugar for validation code which throws exceptions (e.g. validating that the function input is correct). For example:
 ```
 if (myParam == null) {
-	throw new IllegalArgumentException("myParam cannot be null")	
+	throw new IllegalArgumentException("myParam cannot be null")
 } else {
 	//continue program flow
 }
@@ -26,7 +30,7 @@ Tuples can be constructed either by invoking a constructor or static builder (ap
 var result1 = Tuple2.apply("A", 1)
 print (result1.Element1)   // A
 print (result1.Element2)   // 1
-``` 
+```
 A constructor should be used when the type system cannot determine the type (usually when elements are blocks), in which case the element types should be defined explicitly:
 ```
 var e1 = \ -> "A" // a block which returns "A"
@@ -48,10 +52,10 @@ After the tuple classes are generated, they may be checked-in into the source co
 #### ConcurrentRunner
 `ConcurrentRunner` provides an implementation for parallelizing work. It allows submission of callables for execution (in separate threads). It can then optionally block the current thread until the work submitted in separate threads is completed (successfully or not (failed, time-out, etc)). `ConcurrentRunner` knows how to manage the thread pool: by default, it destroys threads after all callables are completed, but they can be set for thread re-use, if necessary.
 
-The API is simple: 
+The API is simple:
 `ConcurrentRunner.run()` submits callables for execution is separate threads and returns a collection of FutureResult(s).
 
-`ConcurrentRunner.collect()` blocks the thread until all callables are completed (either successfully or not). 
+`ConcurrentRunner.collect()` blocks the thread until all callables are completed (either successfully or not).
 
 `FutureResult` can be either success or failure. Success allows to retrieve the value returned by a callable. If callable failed, FutureFailure contains the throwable which aborted the execution. If not all threads are completed prior to the timeout (the default is 60 seconds but can be overwritten), a warning is logged.
 
@@ -82,8 +86,8 @@ Most Guidewire implementations will prefer to use ContextAwareConcurrentRunner, 
 Sample usage:
 ```
 var logger = Logger.finder.DEV  // get development logger (logs at the trace level)
-logger.debug(\ -> "Starting")   // use the method with a block parameter since 
-								// the logger evaluate the block only if the debug 
+logger.debug(\ -> "Starting")   // use the method with a block parameter since
+								// the logger evaluate the block only if the debug
 								// level or above is set (more efficient)
 
 ```
@@ -106,7 +110,7 @@ logger.debug(\ -> "Started")
 
 
 ### Type System
-`TypeSystemUtil` allows reflective construction of objects by their class names. 
+`TypeSystemUtil` allows reflective construction of objects by their class names.
 
 The example below constructs an instance of a Tuple2 class by passing class name and parameters:
 ```
@@ -117,7 +121,7 @@ return TypeSystemUtil.getInstanceByClassName(className, params) as Tuple2
 
 ### Comparators
 #### AssumeMatchIfTargetNotSetComparator
-`AssumeMatchIfTargetNotSetComparator` is the implementation which bypasses equality checks between a criteria and a target if the target is not set; it simply returns true. However, if the target is set, then the criteria must be equal to the target. Equality is assessed via a collection of functions ranging from a simple `equals()` to more sophisticated `equalsAsCaseInsensitiveString()`, `equalsAsCaseSensitiveString()`, `equalsAsCaseInsensitiveNoWhitespaceString()`, `startsWithAsCaseSensitiveString()`, etc. 
+`AssumeMatchIfTargetNotSetComparator` is the implementation which bypasses equality checks between a criteria and a target if the target is not set; it simply returns true. However, if the target is set, then the criteria must be equal to the target. Equality is assessed via a collection of functions ranging from a simple `equals()` to more sophisticated `equalsAsCaseInsensitiveString()`, `equalsAsCaseSensitiveString()`, `equalsAsCaseInsensitiveNoWhitespaceString()`, `startsWithAsCaseSensitiveString()`, etc.
 
 Sample usage:
 ```
@@ -152,7 +156,7 @@ print (result.Unchanged.join(", "))       // D, B, C
 
 ### Enhancements
 #### Iterable.firstNotNull_ext()
-`Iterable.firstNotNull_ext()` iterates over each element of an iterable until it finds a value which is not null. If the iterable contains blocks, evaluates blocks until it finds the one which returns a value which is not null and returns that value. 
+`Iterable.firstNotNull_ext()` iterates over each element of an iterable until it finds a value which is not null. If the iterable contains blocks, evaluates blocks until it finds the one which returns a value which is not null and returns that value.
 
 Sample usage:
 ```
@@ -165,7 +169,7 @@ var c = \ -> "C"
 
 var result2 = { a, b, c }.firstNotNull_Ext()
 print (result2) // B
-``` 
+```
 
 #### java.util.Date Enhancements
 `java.util.Date` is enhanced with static functions to calculate duration between two dates, as well as customizable user-friendly formatting, e.g. 1 Day 5 Hours 10 Minutes, etc.
@@ -243,9 +247,9 @@ The results are reported in milliseconds.
 
 
 ### Stack Trace Element Decorator
-`StackTraceElementEnhancement` allows the selection of a stack trace element using the offset relative to some base stack trace frame  and "decorate" it with additional properties, such as package name, class name, function name, etc. It is used in the logger implementation to customize the format of a log entry but can be used generically. 
+`StackTraceElementEnhancement` allows the selection of a stack trace element using the offset relative to some base stack trace frame  and "decorate" it with additional properties, such as package name, class name, function name, etc. It is used in the logger implementation to customize the format of a log entry but can be used generically.
 
-The stack trace element decorator should be used sparingly, as it has a performance penalty. Performance is not an issue in development environments where trace and debug level logging mode are used extensively. In a production setting, a performance penalty is mitigated by logging at a much higher log level (typically info, or error), so calls to the decorator are minimized. 
+The stack trace element decorator should be used sparingly, as it has a performance penalty. Performance is not an issue in development environments where trace and debug level logging mode are used extensively. In a production setting, a performance penalty is mitigated by logging at a much higher log level (typically info, or error), so calls to the decorator are minimized.
 
 See Logger for usage.
 
