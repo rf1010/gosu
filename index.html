@@ -29,9 +29,14 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h1>
-<a id="gosu" class="anchor" href="#gosu" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>gosu</h1>
+<a id="gosu-lang-ext" class="anchor" href="#gosu-lang-ext" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>gosu-lang-ext</h1>
 
-<p>Provides extendions to standard gosu libraries.</p>
+<p>Provides extensions to the standard <a href="https://github.com/gosu-lang/gosu-lang" title="gosu-lang">gosu-lang</a> libraries.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<p>Released under version 2.0 of the <a href="http://www.apache.org/licenses/LICENSE-2.0.txt" title="License">Apache License</a>.</p>
 
 <h3>
 <a id="validation" class="anchor" href="#validation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Validation</h3>
@@ -39,7 +44,7 @@
 <p><code>Validation.require()</code>  is a syntactic sugar for validation code which throws exceptions (e.g. validating that the function input is correct). For example:</p>
 
 <pre><code>if (myParam == null) {
-    throw new IllegalArgumentException("myParam cannot be null")    
+    throw new IllegalArgumentException("myParam cannot be null")
 } else {
     //continue program flow
 }
@@ -51,6 +56,69 @@
 </code></pre>
 
 <p>The class also allows for construction of other exceptions or executing alternative flows if the condition does not evaluate to true.</p>
+
+<h3>
+<a id="run---wrapper-for-gwtransactiontransaction" class="anchor" href="#run---wrapper-for-gwtransactiontransaction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run - wrapper for <code>gw.transaction.Transaction</code>
+</h3>
+
+<h4>
+<a id="what" class="anchor" href="#what" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What</h4>
+
+<p>Useful abstractions which allow running functions with Guidewire bundles under
+context of different users. This is particularly useful for Guidewire entity builders.</p>
+
+<h5>
+<a id="note" class="anchor" href="#note" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Note:</h5>
+
+<p>This class is applicable to the Guidewire platform and is not useful for
+<code>gosu-lang</code> developers on the open-source version.</p>
+
+<h4>
+<a id="why" class="anchor" href="#why" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why</h4>
+
+<p>Guidewire provides <code>gw.transaction.Transaction</code> class to handle programming cases
+when an explicit bundle is required in the application code. These use cases are
+documented extensively in the Guidewire documentation.</p>
+
+<p>This class is an abstraction for the cases when a function, which requires a bundle,
+also returns a value. This is typical for Guidewire entity builders, which require
+a bundle but also return an entity object.</p>
+
+<p>Additionally, "Run" is a bit faster to type than "Transaction". For this reason,
+it is a separate class, rather than an enhancement on the existing "Transaction" type.</p>
+
+<h4>
+<a id="how" class="anchor" href="#how" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How</h4>
+
+<h5>
+<a id="without-this-class" class="anchor" href="#without-this-class" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Without this class</h5>
+
+<pre><code>import gw.transaction.Transaction
+
+var result: A
+
+Transaction.runWithNewBundle(\bundle -&gt; {
+  result = new XYXBuilder()
+    .withA()
+    .withB()
+    .create(bundle)
+}, user)
+
+return result
+</code></pre>
+
+<h5>
+<a id="with-this-class" class="anchor" href="#with-this-class" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With this class</h5>
+
+<pre><code>import gosu.transaction.enhancements.Run
+
+var result = Run.asUser(\bundle -&gt; {
+  new XYXBuilder()
+    .withA()
+    .withB()
+    .create(bundle)
+}, user)
+</code></pre>
 
 <h3>
 <a id="algebraic-data-types-atds" class="anchor" href="#algebraic-data-types-atds" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Algebraic Data Types (ATDs)</h3>
@@ -94,10 +162,10 @@ print (result2.Element2()) // evaluate Element1() - returns 1
 
 <p><code>ConcurrentRunner</code> provides an implementation for parallelizing work. It allows submission of callables for execution (in separate threads). It can then optionally block the current thread until the work submitted in separate threads is completed (successfully or not (failed, time-out, etc)). <code>ConcurrentRunner</code> knows how to manage the thread pool: by default, it destroys threads after all callables are completed, but they can be set for thread re-use, if necessary.</p>
 
-<p>The API is simple: 
+<p>The API is simple:
 <code>ConcurrentRunner.run()</code> submits callables for execution is separate threads and returns a collection of FutureResult(s).</p>
 
-<p><code>ConcurrentRunner.collect()</code> blocks the thread until all callables are completed (either successfully or not). </p>
+<p><code>ConcurrentRunner.collect()</code> blocks the thread until all callables are completed (either successfully or not).</p>
 
 <p><code>FutureResult</code> can be either success or failure. Success allows to retrieve the value returned by a callable. If callable failed, FutureFailure contains the throwable which aborted the execution. If not all threads are completed prior to the timeout (the default is 60 seconds but can be overwritten), a warning is logged.</p>
 
@@ -132,8 +200,8 @@ print(resultCount) // prints the count of successful results
 <p>Sample usage:</p>
 
 <pre><code>var logger = Logger.finder.DEV  // get development logger (logs at the trace level)
-logger.debug(\ -&gt; "Starting")   // use the method with a block parameter since 
-                                // the logger evaluate the block only if the debug 
+logger.debug(\ -&gt; "Starting")   // use the method with a block parameter since
+                                // the logger evaluate the block only if the debug
                                 // level or above is set (more efficient)
 
 </code></pre>
@@ -157,7 +225,7 @@ logger.debug(\ -&gt; "Started")
 <h3>
 <a id="type-system" class="anchor" href="#type-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Type System</h3>
 
-<p><code>TypeSystemUtil</code> allows reflective construction of objects by their class names. </p>
+<p><code>TypeSystemUtil</code> allows reflective construction of objects by their class names.</p>
 
 <p>The example below constructs an instance of a Tuple2 class by passing class name and parameters:</p>
 
@@ -172,7 +240,7 @@ return TypeSystemUtil.getInstanceByClassName(className, params) as Tuple2
 <h4>
 <a id="assumematchiftargetnotsetcomparator" class="anchor" href="#assumematchiftargetnotsetcomparator" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>AssumeMatchIfTargetNotSetComparator</h4>
 
-<p><code>AssumeMatchIfTargetNotSetComparator</code> is the implementation which bypasses equality checks between a criteria and a target if the target is not set; it simply returns true. However, if the target is set, then the criteria must be equal to the target. Equality is assessed via a collection of functions ranging from a simple <code>equals()</code> to more sophisticated <code>equalsAsCaseInsensitiveString()</code>, <code>equalsAsCaseSensitiveString()</code>, <code>equalsAsCaseInsensitiveNoWhitespaceString()</code>, <code>startsWithAsCaseSensitiveString()</code>, etc. </p>
+<p><code>AssumeMatchIfTargetNotSetComparator</code> is the implementation which bypasses equality checks between a criteria and a target if the target is not set; it simply returns true. However, if the target is set, then the criteria must be equal to the target. Equality is assessed via a collection of functions ranging from a simple <code>equals()</code> to more sophisticated <code>equalsAsCaseInsensitiveString()</code>, <code>equalsAsCaseSensitiveString()</code>, <code>equalsAsCaseInsensitiveNoWhitespaceString()</code>, <code>startsWithAsCaseSensitiveString()</code>, etc.</p>
 
 <p>Sample usage:</p>
 
@@ -213,7 +281,7 @@ print (result.Unchanged.join(", "))       // D, B, C
 <h4>
 <a id="iterablefirstnotnull_ext" class="anchor" href="#iterablefirstnotnull_ext" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Iterable.firstNotNull_ext()</h4>
 
-<p><code>Iterable.firstNotNull_ext()</code> iterates over each element of an iterable until it finds a value which is not null. If the iterable contains blocks, evaluates blocks until it finds the one which returns a value which is not null and returns that value. </p>
+<p><code>Iterable.firstNotNull_ext()</code> iterates over each element of an iterable until it finds a value which is not null. If the iterable contains blocks, evaluates blocks until it finds the one which returns a value which is not null and returns that value.</p>
 
 <p>Sample usage:</p>
 
@@ -315,9 +383,9 @@ The results are reported in milliseconds.</p>
 <h3>
 <a id="stack-trace-element-decorator" class="anchor" href="#stack-trace-element-decorator" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stack Trace Element Decorator</h3>
 
-<p><code>StackTraceElementEnhancement</code> allows the selection of a stack trace element using the offset relative to some base stack trace frame  and "decorate" it with additional properties, such as package name, class name, function name, etc. It is used in the logger implementation to customize the format of a log entry but can be used generically. </p>
+<p><code>StackTraceElementEnhancement</code> allows the selection of a stack trace element using the offset relative to some base stack trace frame  and "decorate" it with additional properties, such as package name, class name, function name, etc. It is used in the logger implementation to customize the format of a log entry but can be used generically.</p>
 
-<p>The stack trace element decorator should be used sparingly, as it has a performance penalty. Performance is not an issue in development environments where trace and debug level logging mode are used extensively. In a production setting, a performance penalty is mitigated by logging at a much higher log level (typically info, or error), so calls to the decorator are minimized. </p>
+<p>The stack trace element decorator should be used sparingly, as it has a performance penalty. Performance is not an issue in development environments where trace and debug level logging mode are used extensively. In a production setting, a performance penalty is mitigated by logging at a much higher log level (typically info, or error), so calls to the decorator are minimized.</p>
 
 <p>See Logger for usage.</p>
 
@@ -333,14 +401,14 @@ print (stackTraceLine)
 <a id="gosu-builder-for-google-guava-cache" class="anchor" href="#gosu-builder-for-google-guava-cache" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gosu Builder for Google Guava Cache</h3>
 
 <h4>
-<a id="what" class="anchor" href="#what" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What</h4>
+<a id="what-1" class="anchor" href="#what-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What</h4>
 
 <p>This package contains Gosu classes which make the use of Google Guava cache from Gosu simpler
 for Gosu developers, as it is using the familiar "builder" interface. In fact, it is a wrapper for
 Google Guava cache builder API, with sensible defaults and ability to overwrite cache parameters.</p>
 
 <h4>
-<a id="why" class="anchor" href="#why" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why</h4>
+<a id="why-1" class="anchor" href="#why-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why</h4>
 
 <p>Guidewire provides its own implementation of Cache in the <code>gw.util.concurrent.Cache</code> package. However,
 it does not provide API for defining cache eviction strategies (e.g. expire cache after 15 minutes).</p>
@@ -349,7 +417,7 @@ it does not provide API for defining cache eviction strategies (e.g. expire cach
 in most cases.</p>
 
 <h4>
-<a id="how" class="anchor" href="#how" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How</h4>
+<a id="how-1" class="anchor" href="#how-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How</h4>
 
 <p>For most common usage patterns, please see the tests (<code>gtest/gosu/cache/CacheTest</code>) and the cache implementation in
 <code>SimpleCacheImpl</code>. You would likely want to use a singleton pattern. SimpleCacheImpl provides a reference
