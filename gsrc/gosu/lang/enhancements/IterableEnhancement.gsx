@@ -36,6 +36,21 @@ enhancement IterableEnhancement<A>: java.lang.Iterable<A> {
   }
 
   /**
+   *  Checks that all elements of are the same.
+   */
+  property get AllTheSame_ext(): boolean {
+    var first = this.first()
+    return this.allMatch(\elm -> elm == first)
+  }
+
+  /**
+   *  Checks whether all elements are set, i.e. there is not a single one where the value is null.
+   */
+  property get AllNotNull_ext(): boolean {
+    return this.HasElements and not this.hasMatch(\elm -> elm == null)
+  }
+
+  /**
    *  Returns true if the current element is type of block; false otherwise.
    */
   private function isBlock_ext(elm: A): boolean {
