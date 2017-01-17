@@ -4,6 +4,7 @@ uses gw.lang.reflect.IConstructorInfo
 uses gw.lang.reflect.TypeSystem
 uses gosu.functional.Validation
 uses gw.lang.reflect.IType
+uses java.lang.Throwable
 
 /**
  *  A collection of functions to support operations with TypeSystem, i.e. get an instance of a class by class name.
@@ -61,7 +62,7 @@ class TypeSystemUtil {
   @Returns("Full class name")
   static function getClassNameFromType(type: IType): String {
     var fullClassName = type.DisplayName
-    return fullClassName.match("(.+?)\\s*?(<.+?>)?\\s*?(\\(.+?\\))?").Groups?.first()
+    return fullClassName.match("(.+?)\\s*?(<.+?>)?\\s*?(\\(.+?\\))?")?.get(0)
   }
 
   /**
@@ -73,5 +74,30 @@ class TypeSystemUtil {
     return iType.TypeInfo.Methods.hasMatch(\method ->
         method.DeclaredAnnotations.hasMatch(\annotation ->
             annotation.Type == gw.lang.UnstableAPI))
+  }
+
+  /**
+   *  Attempts to cast an object to the given parametrized type. Returns null of the cast is unsuccessful.
+   */
+  @Param("obj", "An object to cast to a type")
+  @Returns("An object of type A")
+  static function toType<A>(obj: Object): A {
+    var result: A
+
+    try {
+      result = obj as A
+    } catch (t: Throwable) {
+      // do nothing - make a safe cast
+    }
+    return result
+  }
+
+  /**
+   *  Checks if the enclosing object is of a given type.
+   */
+  @Param("obj", "An object to test")
+  @Returns("True if the type of enslosing object is of type A; otherwise, false")
+  static function isEnclosingObjectOfType<A>(obj: Object): boolean {
+    return (typeof obj).EnclosingType == A
   }
 }
