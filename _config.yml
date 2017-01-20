@@ -1,0 +1,8 @@
+title: Gosu
+description: Extensions to standard gosu libraries
+google_analytics: UA-63714592-1
+show_downloads: true
+theme: jekyll-theme-modernist
+
+gems:
+  - jekyll-mentions
