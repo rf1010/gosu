@@ -70,6 +70,12 @@ var result = Run.asUser(\bundle -> {
     .create(bundle)
 }, user)
 ```
+
+### Runtime Error Handling
+`Invoke.safely(callable, errorHandler)` is the syntactic sugar for `try {} catch {}` blocks. If the error handler is omitted but an error occurs during the callable execution, the error message is logged but the program execution continues. Otherwise, an error handler is invoked, which may re-throw an exception or perform other actions. 
+
+There are separate method signatures for callables (returning values) and runnables (not returning anything).
+
 ### Algebraic Data Types (ATDs)
 #### Tuples
 Tuple is an ordered list of elements in which elements can be of different types. The element projections (typed values) are exposed as ElementN where N ranges from 1 to max dimension or arity.  Tuples are useful as composite type constructors which contain proper equals() and hashCode() implementations, which make them usable as composite keys in HashMaps, Sets, etc. However, caution should be exercised at high arities, as tuples inhibit understanding of code (e.g. what does Tuple10.Element10 mean?).
@@ -156,8 +162,6 @@ var logger = Logger.finder.DEV.withDecorator(customLogDecorator)
 logger.debug(\ -> "Started")
 ```
 
-
-
 ### Type System
 `TypeSystemUtil` allows reflective construction of objects by their class names.
 
@@ -167,6 +171,11 @@ var params = { e1, e2 }.toArray()
 var className = TypeSystemUtil.getClassNameFromType(Tuple2)
 return TypeSystemUtil.getInstanceByClassName(className, params) as Tuple2
 ```
+
+Additionally `toType<A>(obj)` allows to do safe casts to types: if an object cannot be cast to the type, it returns a null but does not throw an exception.
+
+### Reflection Utility Enhancements
+`ReflectUtil` enhancement implements additional functions which allow to get properties and invoke functions and return results as typed values (rather than java.lang.Object).
 
 ### Comparators
 #### AssumeMatchIfTargetNotSetComparator
@@ -251,6 +260,7 @@ var result = Stopwatch.measureWarmedExecutionDuration(\ -> doWork(10000))
 print (result.DurationDisplayValue)
 // 0 Days 0 Hours 0 Minutes 0 Seconds 6 Milliseconds 120 Microseconds 0 Nanoseconds
 ```
+There are separate function signatures for callables (e.g. returning a value) and runnables (e.g. not returning anything). 
 
 #### Performance Capture
 In most modern applications, ongoing performance management is of a paramount concern, but the answer is not
@@ -366,6 +376,9 @@ a big issue, and this should be activated if you are using cache statistics in y
 It gets called every time the key is not found in cache.
 
 `build()`: returns the instance of Cache.
+
+#### Runtime Configurable Cache
+`IRuntimeConfigurableCache` supports redefining of certain cache parameters at runtime (MaxSize, ExpireAfterExcess). `RuntimeConfigurableCacheImpl` provides an abstraction for these operations and maybe used in concrete cache implementations via the `delegate` language feature.
 
 ### ClassLoaderUtil
 Contains a variety of functions and properties to troubleshoot class loading on a JVM.
